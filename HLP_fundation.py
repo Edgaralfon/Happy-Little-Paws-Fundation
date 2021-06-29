@@ -1,9 +1,9 @@
-from random import randint, randrange
+from random import choice, randint, randrange
 from os import system
 
 id_lists = []
-users_list = {}
-pets_list = {}
+users = {}
+pets = {}
 
 
 ##### Asignacion de una id digital para el sistema #####
@@ -37,6 +37,7 @@ class employee(human):
     def __init__(self, dni, name, sex, address, email, phone, charge, since):
         super().__init__(dni, name, sex, address, email, phone)
         #self.id
+        self.type = 'EMPLEADO'
         self.charge = charge
         self.since = since
 ########### Clase adoptador ###########
@@ -44,12 +45,14 @@ class adopter(human):
     def __init__(self, dni, name, sex, address, email, phone, able_to_adopt):
         super().__init__(dni, name, sex, address, email, phone)
         #self.id
+        self.type = 'ADOPTANTE'
         self.able_to_adopt = able_to_adopt
 ########### Clase donante ###########
 class donor(human):
     def __init__(self, dni, name, sex, address, email, phone):
         super().__init__(dni, name, sex, address, email, phone)
         #self.id
+        self.type = 'DONANTE'
 
 
 class pet(identifier):
@@ -67,31 +70,36 @@ class dog(pet):
     def __init__(self, name, age, sex, breed, weight, available_for_adoption):
         super().__init__(name, age, sex, breed, weight, available_for_adoption)
         #self.id
+        self.type = 'PERRO'
 ########### Clase hamster ###########
 class hamster(pet):
     def __init__(self, name, age, sex, breed, weight, available_for_adoption):
         super().__init__(name, age, sex, breed, weight, available_for_adoption)
         #self.id
+        self.type = 'HAMSTER'
 ########### Clase loro ###########
 class parrot(pet):
     def __init__(self, name, age, sex, breed, weight, available_for_adoption):
         super().__init__(name, age, sex, breed, weight, available_for_adoption)
         #self.id
+        self.type = 'LORO'
 ########### Clase perico ###########
 class parakeet(pet):
     def __init__(self, name, age, sex, breed, weight, available_for_adoption):
         super().__init__(name, age, sex, breed, weight, available_for_adoption)
         #self.id
+        self.type = 'PERICO'
 ########### Clase gato ###########
 class cat(pet):
     def __init__(self, name, age, sex, breed, weight, available_for_adoption):
         super().__init__(name, age, sex, breed, weight, available_for_adoption)
         #self.id
+        self.type = 'GATO'
 
 
 ########### Funcion para registrar usuario ###########
 def register_user():
-    #system('clear')
+    system('clear')
     choice = int(input("""
 ↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
 
@@ -108,7 +116,6 @@ Por favor, ingrese el tipo de usuario a registrar: """))
 ↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
 
 ↦↦↦↦↦↦ Registro de adoptador ↤↤↤↤↤↤""")
-        type = 'ADOPTADOR'
         dni = input('Cedula: ')
         name = input('Nombre: ')
         sex = input('Sexo: ')
@@ -117,9 +124,7 @@ Por favor, ingrese el tipo de usuario a registrar: """))
         phone = input('Telefono: ')
         able_to_adopt = input('Posibilidad de adoptar: ')
         var = adopter(dni, name, sex, address, email, phone, able_to_adopt)
-        users_list[1]=1
-        print(users_list)
-       
+        users[var.id] = var
     elif choice == 2:
         system('clear')
         ########### Funcion para registrar empleado ###########
@@ -127,17 +132,35 @@ Por favor, ingrese el tipo de usuario a registrar: """))
 ↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
 
 ↦↦↦↦↦↦ Registro de empleado ↤↤↤↤↤↤""")
-        type = 'EMPLEADO'
         dni = input('Cedula: ')
         name = input('Nombre: ')
         sex = input('Sexo: ')
         address = input('Direccion: ')
         email = input('Correo electronico: ')
         phone = input('Telefono: ')
-        charge = input()
-        since = input()
+        charge = input('Cargo: ')
+        since = input('Desde: ')
+        var = employee(dni, name, sex, address, email, phone, charge, since)
+        users[var.id] = var
     else:
         main()
+
+
+def menu_pets(n):
+    system('clear')
+    list_of_pets = ['gatos','hamsters','loros','pericos','perros']
+    print(f'''
+↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
+
+↦↦↦↦↦↦ Registro para {list_of_pets[n]} ↤↤↤↤↤↤''')
+    name = input('Nombre: ')
+    age = int(input('Edad(Puede ser aprox): '))
+    sex = input('Sexo: ')
+    breed = input('Raza: ')
+    weight = float(input('Peso(Kg): '))
+    available_for_adoption = input('Disponible para adopcion?: ')
+    var = cat(name, age, sex, breed, weight, available_for_adoption)
+    pets[var.id] = var
 
 ########### Funcion para registrar animal ###########
 def register_pet():
@@ -155,82 +178,48 @@ def register_pet():
 
 Por favor, ingrese el tipo de animal a registrar: '''))
     if choice == 1:
-        system('clear')
-        print('''
-↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
-
-↦↦↦↦↦↦ Registro para gatos ↤↤↤↤↤↤''')
-        type = 'GATO'
-        name = input('Nombre: ')
-        age = int(input('Edad(Puede ser aprox): '))
-        if age != int: raise ValueError
-        sex = input('Sexo: ')
-        breed = input('Raza: ')
-        weight = float(input('Peso(Kg): '))
-        available_for_adoption = input('Disponible para adopcion?: ')
+        menu_pets(choice-1)
         
     elif choice == 2:
-        system('clear')
-        print('''
-↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
-
-↦↦↦↦↦↦ Registro para gatos ↤↤↤↤↤↤''')
-        type = 'HAMSTER'
-        name = input('Nombre: ')
-        age = int(input('Edad(Puede ser aprox): '))
-        sex = input('Sexo: ')
-        breed = input('Raza: ')
-        weight = float(input('Peso(Kg): '))
-        available_for_adoption = input('Disponible para adopcion?: ')
+        menu_pets(choice-1)
 
     elif choice == 3:
-        system('clear')
-        print('''
-↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
-
-↦↦↦↦↦↦ Registro para gatos ↤↤↤↤↤↤''')
-        type = 'LORO'
-        name = input('Nombre: ')
-        age = int(input('Edad(Puede ser aprox): '))
-        sex = input('Sexo: ')
-        breed = input('Raza: ')
-        weight = float(input('Peso(Kg): '))
-        available_for_adoption = input('Disponible para adopcion?: ')
+        menu_pets(choice-1)
 
     elif choice == 4:
-        system('clear')
-        print('''
-↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
-
-↦↦↦↦↦↦ Registro para gatos ↤↤↤↤↤↤''')
-        type = 'PERICO'
-        name = input('Nombre: ')
-        age = int(input('Edad(Puede ser aprox): '))
-        sex = input('Sexo: ')
-        breed = input('Raza: ')
-        weight = float(input('Peso(Kg): '))
-        available_for_adoption = input('Disponible para adopcion?: ')
+        menu_pets(choice-1)
 
     elif choice == 5:
-        system('clear')
-        print('''
-↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
-
-↦↦↦↦↦↦ Registro para gatos ↤↤↤↤↤↤''')
-        type = 'PERRO'
-        name = input('Nombre: ')
-        age = int(input('Edad(Puede ser aprox): '))
-        sex = input('Sexo: ')
-        breed = input('Raza: ')
-        weight = float(input('Peso(Kg): '))
-        available_for_adoption = input('Disponible para adopcion?: ')
+        menu_pets(choice-1)
 
     else:
         main()
 
-def modify_regis():
+def modify_registration():
     system('clear')
-    pass
+    choice = int(input('''
+↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
+
+↦↦↦↦↦↦ Modificar registro ↤↤↤↤↤↤
+    1. Lista de usuarios
+    2. Lista de animales
+
+Por favor, ingrese una opcion: '''))
+    if choice == 1:
+        system('clear')
+        print('''
+↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
+
+↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤
+''')
+        for id, data in users.items():
+            print(f'''{id} | {data.type} | {data.name}\n''')
+        enter = input('Ingrese el ID del registro a modificar: ')
+    elif choice == 2:
+        pass
+    else:
+        main()
+
 
 def delete_user():
     system('clear')
@@ -251,7 +240,6 @@ def donation():
 
 def main():
     system('clear')
-    #🅷🅰🅿🅿🆈 🅻🅸🆃🆃🅻🅴 🅿🅰🆆🆂 🅵🆄🅽🅳🅰🆃🅸🅾🅽
     choice = int(input('''
 ↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤
 Bienvenida(o)
