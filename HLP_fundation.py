@@ -181,7 +181,8 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
     else:
         main()
 
-###### FALTA CORREGIR ######
+########################################## FALTA CORREGIR ##########################################
+########################################## FALTA CORREGIR ##########################################
 def modify_registration():
     system('clear')
     hlpf()
@@ -210,7 +211,8 @@ Por favor, ingrese una opcion: '''))-1
             enter = input('Ingrese el ID del registro a modificar: ')
     else:
         main()
-
+########################################## FALTA CORREGIR ##########################################
+########################################## FALTA CORREGIR ##########################################
 
 def delete_user():
     system('clear')
