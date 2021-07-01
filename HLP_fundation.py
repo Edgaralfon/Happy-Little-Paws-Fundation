@@ -1,12 +1,9 @@
 from random import choice, randint, randrange
 from os import system
 
-id_lists = []
-users = {}
-pets = {}
-
 
 ##### Asignacion de una id digital para el sistema #####
+id_lists = []
 def assign_id():
     random_id = randint(1000, 9999)
     if random_id not in id_lists:
@@ -93,11 +90,47 @@ class cat(pet):
         self.type = 'GATO'
 
 
+########### Leer base de datos ###########
+def read_data(type):
+    users = {}
+    pets = {}
+    if type == 'users':
+        try:
+            with open('./Happy Little Paws Fundation/.data_users.txt', 'r', encoding='utf-8') as data:
+                for line in data:
+                    users.append(line)
+        except FileNotFoundError: open('./Happy Little Paws Fundation/.data_users.txt', 'w', encoding='utf-8')
+        
+        return users
+    else:
+        try:
+            with open('./Happy Little Paws Fundation/.data_pets.txt', 'r', encoding='utf-8') as data:
+                for line in data:
+                    pets.append(line)
+        except FileNotFoundError: open('./Happy Little Paws Fundation/.data_pets.txt', 'r', encoding='utf-8')
+        return pets
+
+########### Escribir base de datos ###########
+def write_data(type, list):
+    if type == 'users':
+        with open('./Happy Little Paws Fundation/.data_users.txt', 'w', encoding='utf-8') as data:
+            for idn, object in list.items():
+                data.write(str(idn))
+                data.write(str(object))
+                data.write('\n')
+    else:
+        with open('./Happy Little Paws Fundation/.data_pets.txt', 'w', encoding='utf-8') as data:
+            for idn, object in list.items():
+                data.write(idn, object,'\n')
+
+
+########### Logo de la fundacion ###########
 def hlpf():
     print("""
 ↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤""")
 
 
+########### Comprobacion para registro de usuario o animal ###########
 def confirmation(answer, id):
         if answer == 'si':
             input(f'\nRegistro exitoso con el ID {id}!\n\nPresiona enter para continuar')
@@ -107,10 +140,11 @@ def confirmation(answer, id):
             return False
 
 
-########### Funcion para registrar usuario ###########
+########### Opcion 1 del menu principal, registrar usuario ###########
 def register_user():
     system('clear')
     hlpf()
+    users_data = {}
     choice = int(input("""
 ↦↦↦↦↦↦ Registrar usuario ↤↤↤↤↤↤
     1. Adoptador
@@ -139,12 +173,13 @@ Por favor, ingrese el tipo de usuario a registrar: """))-1
         question = input(f"""\nSeguro deseas registrar este {list_of_users[choice]}? (Si/No): """).lower()
         confir = confirmation(question, var.id)
         if confir == True: 
-            users[var.id] = var
+            users_data[var.id] = var
+        write_data('users', users_data)
     else:
         main()
 
 
-########### Funcion para registrar animal ###########
+########### Opcion 2 del menu principal, registrar animal ###########
 def register_pet():
     system('clear')
     hlpf()
@@ -181,8 +216,10 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
     else:
         main()
 
+
 ########################################## FALTA CORREGIR ##########################################
 ########################################## FALTA CORREGIR ##########################################
+########### Opcion 1 del menu principal, modificar registro ###########
 def modify_registration():
     system('clear')
     hlpf()
@@ -214,20 +251,38 @@ Por favor, ingrese una opcion: '''))-1
 ########################################## FALTA CORREGIR ##########################################
 ########################################## FALTA CORREGIR ##########################################
 
-def delete_user():
-    system('clear')
-    pass
 
-def users_list():
+########### Opcion 4 del menu principal, eliminar usuario ###########
+def delete_user():
     system('clear')
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
     for id, data in users.items():
         print(f'''{id} | {data.type} | {data.name}\n''')
+    idn = int(input('Ingrese el ID del registro a eliminar (Para volver solo presione enter sin ingresar): '))
+    if idn in users.keys():
+        del users[idn]
+        input('\nUsuario eliminado\n\nPresione enter para continuar')
+    elif len(idn) == 0:
+        main()
+    else:
+        input('\nUsuario no encontrado\n\nPresione enter para continuar')
+        delete_user()
+
+
+########### Opcion 5 del menu principal, lista de usuarios ###########
+def users_list():
+    system('clear')
+    hlpf()
+    print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
+    users_data = read_data('users')
+    for id, data in users_data.items():
+        print(f'''{id} | {data.type} | {data.name}\n''')
     input('Presione enter para continuar')
     main()
 
 
+########### Opcion 6 del menu principal, lista de animales ###########
 def animals_list():
     system('clear')
     hlpf()
@@ -237,11 +292,14 @@ def animals_list():
     input('Presione enter para continuar')
     main()
 
+
+########### Opcion 7 del menu principal, registrar donacion ###########
 def donation():
     system('clear')
     pass
 
 
+############################## Menu principal ##############################
 def main():
     system('clear')
     hlpf()
@@ -275,6 +333,7 @@ Por favor, ingrese el numero correspondiente a la opción deseada: '''))
         elif choice == 7:
             donation()
     exit()
+
 
 if __name__ == '__main__':
     main()
