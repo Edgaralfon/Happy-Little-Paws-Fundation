@@ -1,5 +1,6 @@
 from random import choice, randint, randrange
 from os import system
+import pickle
 
 
 ##### Asignacion de una id digital para el sistema #####
@@ -7,10 +8,10 @@ id_lists = []
 def assign_id():
     random_id = randint(1000, 9999)
     if random_id not in id_lists:
+        id_lists.append(random_id)
         return random_id
     else:
         random_id = assign_id()
-    id_lists.append(random_id)
 
 
 ########### Clase main ###########
@@ -92,42 +93,55 @@ class cat(pet):
 
 ########### Leer base de datos ###########
 def read_data(type):
-    users = {}
-    pets = {}
+    global id_lists
+    try:
+        with open('./.data', 'rb') as id_data:
+            id_lists = pickle.load(id_data)
+            id_data.close()
+            del id_data
+    except FileNotFoundError: open('./.data', 'wb')
     if type == 'users':
         try:
-            with open('./Happy Little Paws Fundation/.data_users.txt', 'r', encoding='utf-8') as data:
-                for line in data:
-                    users.append(line)
-        except FileNotFoundError: open('./Happy Little Paws Fundation/.data_users.txt', 'w', encoding='utf-8')
-        
-        return users
-    else:
+            with open('./.users_data', 'rb') as data:
+                users = pickle.load(data)
+                data.close()
+                del data
+                return users
+        except FileNotFoundError: 
+            open('./.users_data', 'wb')
+            return []
+    elif type == 'pets':
         try:
-            with open('./Happy Little Paws Fundation/.data_pets.txt', 'r', encoding='utf-8') as data:
-                for line in data:
-                    pets.append(line)
-        except FileNotFoundError: open('./Happy Little Paws Fundation/.data_pets.txt', 'r', encoding='utf-8')
-        return pets
+            with open('./.pets_data', 'rb') as data:
+                pets = pickle.load(data)
+                data.close()
+                del data
+                return pets
+        except FileNotFoundError: 
+            open('./.pets_data', 'wb')
+            return []
 
 ########### Escribir base de datos ###########
 def write_data(type, list):
+    global id_lists
+    with open('./.data', 'wb') as id_data:
+        pickle.dump(list, id_data)
+        id_data.close()
+        del id_data
     if type == 'users':
-        with open('./Happy Little Paws Fundation/.data_users.txt', 'w', encoding='utf-8') as data:
-            for idn, object in list.items():
-                data.write(str(idn))
-                data.write(str(object))
-                data.write('\n')
+        with open('./.users_data', 'wb') as data:
+            pickle.dump(list, data)
+            data.close()
+            del data
     else:
-        with open('./Happy Little Paws Fundation/.data_pets.txt', 'w', encoding='utf-8') as data:
-            for idn, object in list.items():
-                data.write(idn, object,'\n')
+        with open('./.pets_data', 'wb') as data:
+            pickle.dump(list, data)
+            data.close()
+            del data
 
 
 ########### Logo de la fundacion ###########
-def hlpf():
-    print("""
-↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤""")
+def hlpf(): system('clear'), print("\n↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤")
 
 
 ########### Comprobacion para registro de usuario o animal ###########
@@ -142,9 +156,7 @@ def confirmation(answer, id):
 
 ########### Opcion 1 del menu principal, registrar usuario ###########
 def register_user():
-    system('clear')
     hlpf()
-    users_data = {}
     choice = int(input("""
 ↦↦↦↦↦↦ Registrar usuario ↤↤↤↤↤↤
     1. Adoptador
@@ -153,8 +165,8 @@ def register_user():
 
 Por favor, ingrese el tipo de usuario a registrar: """))-1
     if choice > -1 and choice < 2:
+        users_data = read_data('users')
         list_of_users = ['adoptante','empleado']
-        system('clear')
         hlpf()
         print(f"""\n↦↦↦↦↦↦ Registro de {list_of_users[choice]} ↤↤↤↤↤↤""")
         dni = input('Cedula: ')
@@ -173,7 +185,7 @@ Por favor, ingrese el tipo de usuario a registrar: """))-1
         question = input(f"""\nSeguro deseas registrar este {list_of_users[choice]}? (Si/No): """).lower()
         confir = confirmation(question, var.id)
         if confir == True: 
-            users_data[var.id] = var
+            users_data.append(var)
         write_data('users', users_data)
     else:
         main()
@@ -181,7 +193,6 @@ Por favor, ingrese el tipo de usuario a registrar: """))-1
 
 ########### Opcion 2 del menu principal, registrar animal ###########
 def register_pet():
-    system('clear')
     hlpf()
     choice = int(input('''
 ↦↦↦↦↦↦ Registrar animal ↤↤↤↤↤↤
@@ -194,7 +205,7 @@ def register_pet():
 
 Por favor, ingrese el tipo de animal a registrar: '''))-1
     if choice > -1 and choice < 5:
-        system('clear')
+        pets_data = read_data('pets') 
         list_of_pets = ['gatos','hamsters','loros','pericos','perros']
         hlpf()
         print(f'''\n↦↦↦↦↦↦ Registro para {list_of_pets[choice]} ↤↤↤↤↤↤\n''')
@@ -212,7 +223,8 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
         question = input(f"""\nSeguro deseas registrar este {list_of_pets[choice]}? (Si/No): """).lower()
         confir = confirmation(question, var.id)
         if confir == True: 
-            pets[var.id] = var
+            pets_data.append(var)
+        write_data('pets', pets_data)
     else:
         main()
 
@@ -220,49 +232,53 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
 ########################################## FALTA CORREGIR ##########################################
 ########################################## FALTA CORREGIR ##########################################
 ########### Opcion 1 del menu principal, modificar registro ###########
-def modify_registration():
-    system('clear')
-    hlpf()
-    choice = int(input('''
-↦↦↦↦↦↦ Modificar registro ↤↤↤↤↤↤
-    1. Lista de usuarios
-    2. Lista de animales
-    3. Volver
+# def modify_registration():
+#     hlpf()
+#     choice = int(input('''
+# ↦↦↦↦↦↦ Modificar registro ↤↤↤↤↤↤
+#     1. Lista de usuarios
+#     2. Lista de animales
+#     3. Volver
 
-Por favor, ingrese una opcion: '''))-1
-    if choice > -1 and choice < 2:
-        system('clear')
-        names = ['usuarios', 'animales']
-        hlpf()
-        print(f'\n↦↦↦↦↦↦ Lista de {names[choice]} ↤↤↤↤↤↤\n')
-        if choice == 0:
-            for id, data in users.items():
-                print(f'''{id} | {data.type} | {data.name}\n''')
-            idn = int(input('Ingrese el ID del registro a modificar: '))
-            if idn in users.keys():
-                input('Ok')
+# Por favor, ingrese una opcion: '''))-1
+#     if choice > -1 and choice < 2:
+#         names = ['usuarios', 'animales']
+#         hlpf()
+#         print(f'\n↦↦↦↦↦↦ Lista de {names[choice]} ↤↤↤↤↤↤\n')
+#         if choice == 0:
+#             for id, data in users.items():
+#                 print(f'''{id} | {data.type} | {data.name}\n''')
+#             idn = int(input('Ingrese el ID del registro a modificar: '))
+#             if idn in users.keys():
+#                 input('Ok')
 
-        else:
-            for id, data in pets.items():
-                print(f'''{id} | {data.type} | {data.name}\n''')
-            enter = input('Ingrese el ID del registro a modificar: ')
-    else:
-        main()
+#         else:
+#             for id, data in pets.items():
+#                 print(f'''{id} | {data.type} | {data.name}\n''')
+#             enter = input('Ingrese el ID del registro a modificar: ')
+#     else:
+#         main()
 ########################################## FALTA CORREGIR ##########################################
 ########################################## FALTA CORREGIR ##########################################
 
 
 ########### Opcion 4 del menu principal, eliminar usuario ###########
 def delete_user():
-    system('clear')
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
-    for id, data in users.items():
-        print(f'''{id} | {data.type} | {data.name}\n''')
-    idn = int(input('Ingrese el ID del registro a eliminar (Para volver solo presione enter sin ingresar): '))
-    if idn in users.keys():
-        del users[idn]
-        input('\nUsuario eliminado\n\nPresione enter para continuar')
+    users_data = read_data('users')
+    for data in users_data:
+        print(f'''{data.id} | {data.type} | {data.name}\n''')
+    idn = input('Ingrese el ID del registro a eliminar (Para volver solo presione enter sin ingresar): ')
+    if len(idn) > 0:
+        for n, data in enumerate(users_data):
+            for n, id in enumerate(id_lists):
+                if id == data.id:
+                    del id_lists[n]
+            if int(idn) == data.id:
+                del users_data[n]
+                input('\nUsuario eliminado\n\nPresione enter para continuar')
+                write_data('users', users_data)
     elif len(idn) == 0:
         main()
     else:
@@ -272,36 +288,33 @@ def delete_user():
 
 ########### Opcion 5 del menu principal, lista de usuarios ###########
 def users_list():
-    system('clear')
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
     users_data = read_data('users')
-    for id, data in users_data.items():
-        print(f'''{id} | {data.type} | {data.name}\n''')
+    for data in users_data:
+        print(f'''{data.id} | {data.type} | {data.name}\n''')
     input('Presione enter para continuar')
     main()
 
 
 ########### Opcion 6 del menu principal, lista de animales ###########
 def animals_list():
-    system('clear')
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de animales ↤↤↤↤↤↤\n')
-    for id, data in pets.items():
-        print(f'''{id} | {data.type} | {data.name}\n''')
+    pets_data = read_data('pets')
+    for data in pets_data:
+        print(f'''{data.id} | {data.type} | {data.name}\n''')
     input('Presione enter para continuar')
     main()
 
 
 ########### Opcion 7 del menu principal, registrar donacion ###########
 def donation():
-    system('clear')
-    pass
+    hlpf()
 
 
 ############################## Menu principal ##############################
 def main():
-    system('clear')
     hlpf()
     choice = int(input('''
 Bienvenida(o)
