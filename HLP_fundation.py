@@ -6,9 +6,10 @@ import pickle
 ##### Asignacion de una id digital para el sistema #####
 id_lists = []
 def assign_id():
+    global id_lists
     random_id = randint(1000, 9999)
     if random_id not in id_lists:
-        id_lists.append(random_id)
+        id_lists.append(str(random_id))
         return random_id
     else:
         random_id = assign_id()
@@ -95,11 +96,14 @@ class cat(pet):
 def read_data(type):
     global id_lists
     try:
-        with open('./.data', 'rb') as id_data:
-            id_lists = pickle.load(id_data)
+        id_lists = []
+        id_data = open('./.data', 'r')
+        for id in id_data:
+            id_lists.append(id)
             id_data.close()
             del id_data
-    except FileNotFoundError: open('./.data', 'wb')
+    except FileNotFoundError: open('./.data', 'w')
+    except ValueError: open('./.data', 'w')
     if type == 'users':
         try:
             with open('./.users_data', 'rb') as data:
@@ -107,7 +111,10 @@ def read_data(type):
                 data.close()
                 del data
                 return users
-        except FileNotFoundError: 
+        except FileNotFoundError:
+            open('./.users_data', 'wb')
+            return []
+        except EOFError:
             open('./.users_data', 'wb')
             return []
     elif type == 'pets':
@@ -120,12 +127,16 @@ def read_data(type):
         except FileNotFoundError: 
             open('./.pets_data', 'wb')
             return []
+        except EOFError: 
+            open('./.pets_data', 'wb')
+            return []
 
 ########### Escribir base de datos ###########
 def write_data(type, list):
     global id_lists
-    with open('./.data', 'wb') as id_data:
-        pickle.dump(list, id_data)
+    id_data = open('./.data', 'w')
+    for id in id_lists:
+        id_data.write(id)
         id_data.close()
         del id_data
     if type == 'users':
@@ -281,9 +292,6 @@ def delete_user():
                 write_data('users', users_data)
     elif len(idn) == 0:
         main()
-    else:
-        input('\nUsuario no encontrado\n\nPresione enter para continuar')
-        delete_user()
 
 
 ########### Opcion 5 del menu principal, lista de usuarios ###########
