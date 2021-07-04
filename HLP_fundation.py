@@ -6,6 +6,7 @@ import pickle
 id_lists = []
 users_data = []
 pets_data = []
+donations = 0
 
 
 ##### Asignacion de una id digital para el sistema #####
@@ -55,6 +56,14 @@ class donor(human):
         super().__init__(dni, name, sex, address, email, phone)
         #self.id
         self.type = 'DONANTE'
+        self.__donated = 0
+
+    @property
+    def donated(self):
+        return self.__donated
+    @donated.setter
+    def donated(self, amount):
+        self.__donated += amount
 
 
 ########### Clase animal ###########
@@ -97,13 +106,15 @@ class cat(pet):
 
 ########### Leer base de datos ###########
 def read_data():
-    global id_lists, users_data, pets_data
+    global id_lists, users_data, pets_data, donations
     try:
         with open('./.data', 'rb') as file:
             id_lists = pickle.load(file)
             users_data = pickle.load(file)
             pets_data = pickle.load(file)
+            donations = pickle.load(file)
     except FileNotFoundError: open('./.data', 'wb')
+    except EOFError: pass
 
 
 ########### Escribir base de datos ###########
@@ -112,6 +123,7 @@ def write_data():
         pickle.dump(id_lists, file)
         pickle.dump(users_data, file)
         pickle.dump(pets_data, file)
+        pickle.dump(donations, file)
 
 
 ########### Logo de la fundacion ###########
@@ -288,7 +300,34 @@ def animals_list():
 
 ########### Opcion 7 del menu principal, registrar donacion ###########
 def donation():
+    global donations
+    read_data()
     hlpf()
+    print(f'\n↦↦↦↦↦↦ Agregar donacion ↤↤↤↤↤↤                   Total de donaciones: {donations:5d}$\n')
+    question = input(f"""Desea agregar una donacion? (Si/No): """).lower()
+    if question == 'si':
+        hlpf()
+        print(f'\n↦↦↦↦↦↦ Agregar donacion ↤↤↤↤↤↤                   Total de donaciones: {donations:5d}$\n')
+        dni = input('Cedula: ')
+        name = input('Nombre: ')
+        sex = input('Sexo: ')
+        address = input('Direccion: ')
+        email = input('Correo electronico: ')
+        phone = input('Telefono: ')
+        var = donor(dni, name, sex, address, email, phone)
+        question = input(f"""\nConfirme si los datos estan correctos, (Si/No): """).lower()
+        hlpf()
+        donation = int(input(f'\n↦↦↦↦↦↦ Agregar donacion ↤↤↤↤↤↤                   Total de donaciones: {donations:5d}$\n\nPor favor, ingrese el monto a donar: '))
+        question = input(f"""\nConfirme si el monto es correcto, (Si/No): """).lower()
+        confir = confirmation(question, var.id)
+        if confir == True: 
+            users_data.append(var)
+            id_lists.append(str(var.id))
+            var.donated = donation
+            donations += donation
+        write_data()
+    else:
+        main()
 
 
 ############################## Menu principal ##############################
