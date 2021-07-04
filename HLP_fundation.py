@@ -57,7 +57,6 @@ class donor(human):
         #self.id
         self.type = 'DONANTE'
         self.__donated = 0
-
     @property
     def donated(self):
         return self.__donated
@@ -144,10 +143,10 @@ def confirmation(answer, id) -> bool:
 def register_user():
     hlpf()
     choice = int(input("""
-↦↦↦↦↦↦ Registrar usuario ↤↤↤↤↤↤
-    1. Adoptador
-    2. Empleado
-    3. Volver
+↦↦↦↦↦↦ Registrar usuario ↤↤↤↤↤↤\n
+    (1) Adoptador
+    (2) Empleado
+    (3) Volver
 
 Por favor, ingrese el tipo de usuario a registrar: """))-1
     if choice > -1 and choice < 2:
@@ -182,13 +181,13 @@ Por favor, ingrese el tipo de usuario a registrar: """))-1
 def register_pet():
     hlpf()
     choice = int(input('''
-↦↦↦↦↦↦ Registrar animal ↤↤↤↤↤↤
-    1. Gato
-    2. Hamster
-    3. Loro
-    4. Perico
-    5. Perro
-    6. Volver
+↦↦↦↦↦↦ Registrar animal ↤↤↤↤↤↤\n
+    (1) Gato
+    (2) Hamster
+    (3) Loro
+    (4) Perico
+    (5) Perro
+    (6) Volver
 
 Por favor, ingrese el tipo de animal a registrar: '''))-1
     if choice > -1 and choice < 5:
@@ -217,47 +216,69 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
         main()
 
 
-########################################## FALTA CORREGIR ##########################################
-########################################## FALTA CORREGIR ##########################################
-########### Opcion 1 del menu principal, modificar registro ###########
-# def modify_registration():
-#     hlpf()
-#     choice = int(input('''
-# ↦↦↦↦↦↦ Modificar registro ↤↤↤↤↤↤
-#     1. Lista de usuarios
-#     2. Lista de animales
-#     3. Volver
-
-# Por favor, ingrese una opcion: '''))-1
-#     if choice > -1 and choice < 2:
-#         names = ['usuarios', 'animales']
-#         hlpf()
-#         print(f'\n↦↦↦↦↦↦ Lista de {names[choice]} ↤↤↤↤↤↤\n')
-#         if choice == 0:
-#             for id, data in users.items():
-#                 print(f'''{id} | {data.type} | {data.name}\n''')
-#             idn = int(input('Ingrese el ID del registro a modificar: '))
-#             if idn in users.keys():
-#                 input('Ok')
-
-#         else:
-#             for id, data in pets.items():
-#                 print(f'''{id} | {data.type} | {data.name}\n''')
-#             enter = input('Ingrese el ID del registro a modificar: ')
-#     else:
-#         main()
-########################################## FALTA CORREGIR ##########################################
-########################################## FALTA CORREGIR ##########################################
-
-
-########### Opcion 4 del menu principal, eliminar usuario ###########
-def delete_user():
+########### Opcion 3 del menu principal, lista de usuarios ###########
+def users_list():
     read_data()
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
     for user in users_data:
         print(f'''{user.id} | {user.type} | {user.name}\n''')
-    idn = input('Ingrese el ID del registro a eliminar (Para volver solo presione enter sin ingresar): ')
+    id = int(input('Ingrese el ID del registro para ver mas informacion\n(Para volver solo presione enter sin ingresar): '))
+    if len(str(id)) > 0:
+        found = False
+        for user in users_data:
+            if id == user.id:
+                hlpf()
+                print(f'\n↦↦↦↦↦↦ Informacion de usuario numero {user.id} ({user.type}) ↤↤↤↤↤↤\n')
+                print(f"Cedula: {user.dni}\nNombre: {user.name}\nSexo: {user.sex}\nDireccion: {user.address}\nEmail: {user.email}\nTelefono: {user.phone}")
+                if user.type == 'ADOPTANTE':
+                    print(f'Calificado para adoptar: {user.able_to_adopt}')
+                elif user.type == 'EMPLEADO':
+                    print(f'Cargo: {user.charge}\nDesde: {user.since}')
+                else:
+                    print(f'Dinero donado: {user.donated}')
+                found = True
+                break
+        if found == True : 
+            choice = int(input('\n(1) Modificar usuario     (2) Eliminar usuario     (3) Volver\nPor favor, ingrese una opcion: '))
+            if choice == 1:
+                hlpf()
+                print(f'\n↦↦↦↦↦↦ Informacion de usuario numero {user.id} ({user.type}) ↤↤↤↤↤↤\n')
+                print(f"(1) Cedula: {user.dni}\n(2) Nombre: {user.name}\n(3) Sexo: {user.sex}\n(4) Direccion: {user.address}\n(5) Email: {user.email}\n(6) Telefono: {user.phone}")
+                if user.type == 'ADOPTANTE':
+                    print(f'(7) Calificado para adoptar: {user.able_to_adopt}')
+                elif user.type == 'EMPLEADO':
+                    print(f'(7) Cargo: {user.charge}\n(8) Desde: {user.since}')
+                choice0 = int(input('\nPor favor, ingrese el numero correspondiente al atributo a modificar: ')) - 1
+                attributes = [user.dni, user.name, user.sex, user.address, user.email, user.phone]
+                attributes[choice0] = input('Ingresar:')
+            elif choice == 2:
+                found = False
+                for n, id in enumerate(id_lists):
+                    if id == id:
+                        del id_lists[n]
+                        break
+                for n, user in enumerate(users_data):
+                    if int(id) == user.id:
+                        found = True
+                        del users_data[n]
+                        input('\nUsuario eliminado\n\nPresione enter para continuar')
+                        write_data()
+                        break
+                if found == False: input(f'\nUsuario con el identificador {id} no encontrado\n\nPresione enter para continuar')
+        else: input(f'\nNumero ID invalido (Presione enter para continuar)')
+    elif len(str(id)) == 0:
+        main()
+
+
+########### Opcion 5 del menu principal, lista de usuarios ###########
+def users_lst():
+    read_data()
+    hlpf()
+    print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
+    for data in users_data:
+        print(f'''{data.id} | {data.type} | {data.name}\n''')
+    idn = input('Ingrese el ID del registro a : ')
     if len(idn) > 0:
         found = False
         for n, id in enumerate(id_lists):
@@ -274,15 +295,6 @@ def delete_user():
         if found == False: input(f'\nUsuario con el identificador {idn} no encontrado\n\nPresione enter para continuar')
     elif len(idn) == 0:
         main()
-
-
-########### Opcion 5 del menu principal, lista de usuarios ###########
-def users_list():
-    read_data()
-    hlpf()
-    print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
-    for data in users_data:
-        print(f'''{data.id} | {data.type} | {data.name}\n''')
     input('Presione enter para continuar')
     main()
 
@@ -336,15 +348,15 @@ def main():
     choice = int(input('''
 Bienvenida(o)
 
-↦↦↦↦↦↦ MENÚ DE OPCIONES ↤↤↤↤↤↤
-    1. Registrar usuario
-    2. Registrar animal
-    3. Modificar registro
-    4. Eliminar usuario
-    5. Lista de usuarios
-    6. Lista de animales
-    7. Ingresar donacion
-    8. Salir
+↦↦↦↦↦↦ MENÚ DE OPCIONES ↤↤↤↤↤↤\n
+    (1) Registrar usuario
+    (2) Registrar animal
+    (3) Lista de usuarios
+    (4) 
+    (5) Lista de usuarios
+    (6) Lista de animales
+    (7) Ingresar donacion
+    (8) Salir
 
 Por favor, ingrese el numero correspondiente a la opción deseada: '''))
     while choice != 8:
@@ -353,7 +365,7 @@ Por favor, ingrese el numero correspondiente a la opción deseada: '''))
         elif choice == 2:
             register_pet()
         elif choice == 3:
-            modify_registration()
+            users_list()
         elif choice == 4:
             delete_user()
         elif choice == 5:
