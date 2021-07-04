@@ -2,9 +2,13 @@ from random import choice, randint, randrange
 from os import system
 import pickle
 
+########### base de datos ###########
+id_lists = []
+users_data = []
+pets_data = []
+
 
 ##### Asignacion de una id digital para el sistema #####
-id_lists = []
 def assign_id():
     global id_lists
     random_id = randint(1000, 9999)
@@ -92,45 +96,22 @@ class cat(pet):
 
 
 ########### Leer base de datos ###########
-def read_data(type) -> list:
-    global id_lists
+def read_data():
+    global id_lists, users_data, pets_data
     try:
-        id_lists = []
-        with open('./.data', 'r') as id_data:
-            for data in id_data:
-                data = data.split()
-                for id in range(len(data)):
-                    id_lists.append(data[id])
-    except FileNotFoundError: open('./.data', 'w')
-    if type == 'users':
-        try:
-            with open('./.users_data', 'rb') as data:
-                users = pickle.load(data)
-                return users
-        except FileNotFoundError:
-            open('./.users_data', 'wb')
-            return []
-    elif type == 'pets':
-        try:
-            with open('./.pets_data', 'rb') as data:
-                pets = pickle.load(data)
-                return pets
-        except FileNotFoundError: 
-            open('./.pets_data', 'wb')
-            return []
+        with open('./.data', 'rb') as file:
+            id_lists = pickle.load(file)
+            users_data = pickle.load(file)
+            pets_data = pickle.load(file)
+    except FileNotFoundError: open('./.data', 'wb')
+
 
 ########### Escribir base de datos ###########
-def write_data(type, list):
-    with open('./.data', 'w') as id_data:
-        for id in range(len(id_lists)):
-            id_data.write(id_lists[id])
-            id_data.write(' ')
-    if type == 'users':
-        with open('./.users_data', 'wb') as data:
-            pickle.dump(list, data)
-    else:
-        with open('./.pets_data', 'wb') as data:
-            pickle.dump(list, data)
+def write_data():
+    with open('./.data', 'wb') as file:
+        pickle.dump(id_lists, file)
+        pickle.dump(users_data, file)
+        pickle.dump(pets_data, file)
 
 
 ########### Logo de la fundacion ###########
@@ -158,8 +139,8 @@ def register_user():
 
 Por favor, ingrese el tipo de usuario a registrar: """))-1
     if choice > -1 and choice < 2:
-        users_data = read_data('users')
         list_of_users = ['adoptante','empleado']
+        read_data()
         hlpf()
         print(f"""\n↦↦↦↦↦↦ Registro de {list_of_users[choice]} ↤↤↤↤↤↤""")
         dni = input('Cedula: ')
@@ -180,7 +161,7 @@ Por favor, ingrese el tipo de usuario a registrar: """))-1
         if confir == True: 
             users_data.append(var)
             id_lists.append(str(var.id))
-        write_data('users', users_data)
+        write_data()
     else:
         main()
 
@@ -199,8 +180,8 @@ def register_pet():
 
 Por favor, ingrese el tipo de animal a registrar: '''))-1
     if choice > -1 and choice < 5:
-        pets_data = read_data('pets') 
         list_of_pets = ['gatos','hamsters','loros','pericos','perros']
+        read_data() 
         hlpf()
         print(f'''\n↦↦↦↦↦↦ Registro para {list_of_pets[choice]} ↤↤↤↤↤↤\n''')
         name = input('Nombre: ')
@@ -219,7 +200,7 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
         if confir == True: 
             pets_data.append(var)
             id_lists.append(str(var.id))
-        write_data('pets', pets_data)
+        write_data()
     else:
         main()
 
@@ -259,9 +240,9 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
 
 ########### Opcion 4 del menu principal, eliminar usuario ###########
 def delete_user():
+    read_data()
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
-    users_data = read_data('users')
     for user in users_data:
         print(f'''{user.id} | {user.type} | {user.name}\n''')
     idn = input('Ingrese el ID del registro a eliminar (Para volver solo presione enter sin ingresar): ')
@@ -276,7 +257,7 @@ def delete_user():
                 found = True
                 del users_data[n]
                 input('\nUsuario eliminado\n\nPresione enter para continuar')
-                write_data('users', users_data)
+                write_data()
                 break
         if found == False: input(f'\nUsuario con el identificador {idn} no encontrado\n\nPresione enter para continuar')
     elif len(idn) == 0:
@@ -285,9 +266,9 @@ def delete_user():
 
 ########### Opcion 5 del menu principal, lista de usuarios ###########
 def users_list():
+    read_data()
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
-    users_data = read_data('users')
     for data in users_data:
         print(f'''{data.id} | {data.type} | {data.name}\n''')
     input('Presione enter para continuar')
@@ -296,9 +277,9 @@ def users_list():
 
 ########### Opcion 6 del menu principal, lista de animales ###########
 def animals_list():
+    read_data()
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de animales ↤↤↤↤↤↤\n')
-    pets_data = read_data('pets')
     for data in pets_data:
         print(f'''{data.id} | {data.type} | {data.name}\n''')
     input('Presione enter para continuar')
