@@ -9,7 +9,6 @@ def assign_id():
     global id_lists
     random_id = randint(1000, 9999)
     if random_id not in id_lists:
-        id_lists.append(str(random_id))
         return random_id
     else:
         random_id = assign_id()
@@ -93,70 +92,53 @@ class cat(pet):
 
 
 ########### Leer base de datos ###########
-def read_data(type):
+def read_data(type) -> list:
     global id_lists
     try:
         id_lists = []
-        id_data = open('./.data', 'r')
-        for id in id_data:
-            id_lists.append(id)
-            id_data.close()
-            del id_data
+        with open('./.data', 'r') as id_data:
+            for data in id_data:
+                data = data.split()
+                for id in range(len(data)):
+                    id_lists.append(data[id])
     except FileNotFoundError: open('./.data', 'w')
-    except ValueError: open('./.data', 'w')
     if type == 'users':
         try:
             with open('./.users_data', 'rb') as data:
                 users = pickle.load(data)
-                data.close()
-                del data
                 return users
         except FileNotFoundError:
-            open('./.users_data', 'wb')
-            return []
-        except EOFError:
             open('./.users_data', 'wb')
             return []
     elif type == 'pets':
         try:
             with open('./.pets_data', 'rb') as data:
                 pets = pickle.load(data)
-                data.close()
-                del data
                 return pets
         except FileNotFoundError: 
-            open('./.pets_data', 'wb')
-            return []
-        except EOFError: 
             open('./.pets_data', 'wb')
             return []
 
 ########### Escribir base de datos ###########
 def write_data(type, list):
-    global id_lists
-    id_data = open('./.data', 'w')
-    for id in id_lists:
-        id_data.write(id)
-        id_data.close()
-        del id_data
+    with open('./.data', 'w') as id_data:
+        for id in range(len(id_lists)):
+            id_data.write(id_lists[id])
+            id_data.write(' ')
     if type == 'users':
         with open('./.users_data', 'wb') as data:
             pickle.dump(list, data)
-            data.close()
-            del data
     else:
         with open('./.pets_data', 'wb') as data:
             pickle.dump(list, data)
-            data.close()
-            del data
 
 
 ########### Logo de la fundacion ###########
-def hlpf(): system('clear'), print("\n↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤")
+def hlpf() -> str: system('clear'), print("\n↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦↦ HAPPY LITTLE PAWS FUNDATION ↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤↤")
 
 
 ########### Comprobacion para registro de usuario o animal ###########
-def confirmation(answer, id):
+def confirmation(answer, id) -> bool:
         if answer == 'si':
             input(f'\nRegistro exitoso con el ID {id}!\n\nPresiona enter para continuar')
             return True
@@ -197,6 +179,7 @@ Por favor, ingrese el tipo de usuario a registrar: """))-1
         confir = confirmation(question, var.id)
         if confir == True: 
             users_data.append(var)
+            id_lists.append(str(var.id))
         write_data('users', users_data)
     else:
         main()
@@ -235,6 +218,7 @@ Por favor, ingrese el tipo de animal a registrar: '''))-1
         confir = confirmation(question, var.id)
         if confir == True: 
             pets_data.append(var)
+            id_lists.append(str(var.id))
         write_data('pets', pets_data)
     else:
         main()
@@ -278,18 +262,23 @@ def delete_user():
     hlpf()
     print(f'\n↦↦↦↦↦↦ Lista de usuarios ↤↤↤↤↤↤\n')
     users_data = read_data('users')
-    for data in users_data:
-        print(f'''{data.id} | {data.type} | {data.name}\n''')
+    for user in users_data:
+        print(f'''{user.id} | {user.type} | {user.name}\n''')
     idn = input('Ingrese el ID del registro a eliminar (Para volver solo presione enter sin ingresar): ')
     if len(idn) > 0:
-        for n, data in enumerate(users_data):
-            for n, id in enumerate(id_lists):
-                if id == data.id:
-                    del id_lists[n]
-            if int(idn) == data.id:
+        found = False
+        for n, id in enumerate(id_lists):
+            if id == idn:
+                del id_lists[n]
+                break
+        for n, user in enumerate(users_data):
+            if int(idn) == user.id:
+                found = True
                 del users_data[n]
                 input('\nUsuario eliminado\n\nPresione enter para continuar')
                 write_data('users', users_data)
+                break
+        if found == False: input(f'\nUsuario con el identificador {idn} no encontrado\n\nPresione enter para continuar')
     elif len(idn) == 0:
         main()
 
